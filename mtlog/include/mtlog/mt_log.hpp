@@ -10,6 +10,20 @@
 #include <sstream>
 
 #include <fmt/format.h>
+#include <fmt/ranges.h>
+#include <mtlog/format_pairs.hpp>
+
+template <>
+struct fmt::formatter<std::pair<std::string, std::string>> {
+    constexpr auto parse(format_parse_context& ctx) {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const std::pair<std::string, std::string>& p, FormatContext& ctx) const {
+        return fmt::format_to(ctx.out(), "{} = {}", p.first, p.second);
+    }
+};
 
 namespace mt_logging
 {

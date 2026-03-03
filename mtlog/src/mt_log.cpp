@@ -1,4 +1,4 @@
-﻿#include <mtlog/mt_log.h>
+﻿#include <mtlog/mt_log.hpp>
 
 namespace mt_logging
 {
