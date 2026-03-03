@@ -10,8 +10,8 @@
 #include <sstream>
 
 #include <fmt/format.h>
-#include <fmt/ranges.h>
 #include <mtlog/format_pairs.hpp>
+#include <fmt/ranges.h>
 
 namespace mt_logging
 {
