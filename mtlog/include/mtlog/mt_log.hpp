@@ -74,6 +74,6 @@ namespace mt_logging
 
   };
 
-  extern LoggerThread logger;
+  LoggerThread& logger();
 
 } // namespace mt_logging
