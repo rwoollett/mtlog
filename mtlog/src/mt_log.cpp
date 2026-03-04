@@ -2,8 +2,11 @@
 
 namespace mt_logging
 {
-
-  LoggerThread logger;
+  LoggerThread &logger()
+  {
+    static LoggerThread instance;
+    return instance;
+  }
 
   LoggerThread::LoggerThread()
       : thread_([this]
@@ -54,7 +57,7 @@ namespace mt_logging
     {
       outfile << fmt::format("{} [thread {}]  {}\n",
                              ts,
-                             job.caller_thread_id, 
+                             job.caller_thread_id,
                              job.line);
     }
     else
