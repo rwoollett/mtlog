@@ -8,9 +8,15 @@ namespace mt_logging
     return instance;
   }
 
+  // LoggerThread::LoggerThread()
+  //     : thread_([this]
+  //               { run(); }) {}
   LoggerThread::LoggerThread()
-      : thread_([this]
-                { run(); }) {}
+  {
+    std::unique_lock<std::mutex> lock(mtx_);
+    thread_ = std::thread([this]
+                          { run(); });
+  }
 
   LoggerThread::~LoggerThread()
   {
