@@ -11,11 +11,21 @@ namespace mt_logging
   // LoggerThread::LoggerThread()
   //     : thread_([this]
   //               { run(); }) {}
+  // LoggerThread::LoggerThread()
+  // {
+  //   std::unique_lock<std::mutex> lock(mtx_);
+  //   thread_ = std::thread([this]
+  //                         { run(); });
+  // }
   LoggerThread::LoggerThread()
   {
     std::unique_lock<std::mutex> lock(mtx_);
     thread_ = std::thread([this]
                           { run(); });
+
+    // Wait until worker thread is actually waiting on cv_
+    cv_.wait(lock, [&]
+             { return ready_; });
   }
 
   LoggerThread::~LoggerThread()
@@ -33,21 +43,43 @@ namespace mt_logging
     cv_.notify_all();
   }
 
+  // void LoggerThread::run()
+  // {
+  //   LogJob job;
+  //   while (true)
+  //   {
+  //     {
+  //       std::unique_lock<std::mutex> lock(mtx_);
+  //       cv_.wait(lock, [&]
+  //                { return stop_flag_ || !q_.empty(); });
+  //       if (stop_flag_ && q_.empty())
+  //         return;
+  //       job = std::move(q_.front());
+  //       q_.pop();
+  //     }
+  //     write(job);
+  //   }
+  // }
+
   void LoggerThread::run()
   {
-    LogJob job;
+    std::unique_lock<std::mutex> lock(mtx_);
+    ready_ = true;
+    cv_.notify_one(); // wake constructor
+
     while (true)
     {
-      {
-        std::unique_lock<std::mutex> lock(mtx_);
-        cv_.wait(lock, [&]
-                 { return stop_flag_ || !q_.empty(); });
-        if (stop_flag_ && q_.empty())
-          return;
-        job = std::move(q_.front());
-        q_.pop();
-      }
+      cv_.wait(lock, [&]
+               { return stop_flag_ || !q_.empty(); });
+      if (stop_flag_ && q_.empty())
+        return;
+
+      LogJob job = std::move(q_.front());
+      q_.pop();
+
+      lock.unlock();
       write(job);
+      lock.lock();
     }
   }
 

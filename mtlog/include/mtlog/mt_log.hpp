@@ -53,6 +53,7 @@ namespace mt_logging
     std::queue<LogJob> q_;
     bool stop_flag_ = false;
     std::thread thread_;
+    bool ready_ = false;
 
     void run();
     void stop();
