@@ -12,6 +12,8 @@
 #include <fmt/format.h>
 #include <mtlog/format_pairs.hpp>
 #include <fmt/ranges.h>
+#include <fmt/chrono.h>
+
 
 namespace mt_logging
 {
