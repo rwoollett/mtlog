@@ -27,8 +27,9 @@ if (BUILD_MTLOG_TESTS)
   )
   FetchContent_MakeAvailable(googletest)
   include(CTest) # dashboard
-  #enable_testing()
+  enable_testing()
   add_subdirectory(tests)
+
 endif()
 
 

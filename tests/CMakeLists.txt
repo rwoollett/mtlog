@@ -9,5 +9,3 @@ target_link_libraries(TestMTLog gtest_main gmock_main MTLog)
 include(GoogleTest)
 gtest_discover_tests(TestMTLog)
 
-
-

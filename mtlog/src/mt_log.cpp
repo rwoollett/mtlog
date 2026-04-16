@@ -13,15 +13,24 @@ namespace mt_logging
   {
     std::unique_lock<std::mutex> lock(mtx_);
 
-    // Default log file
     const char *env = std::getenv("MTLOG_LOGFILE");
     std::string logfile = env ? env : "mt_logger.log";
 
+    // 1. Truncate the file once at startup
+    if (std::getenv("MTLOG_CLEAR_ON_START"))
+    {
+      std::ofstream clear_file(logfile, std::ios::out | std::ios::trunc);
+      // clear_file closes automatically here
+    }
+
+    // 2. Reopen in append mode for the lifetime of the logger
     outfile_.open(logfile, std::ios::app);
 
+    // 3. Start worker thread
     thread_ = std::thread([this]
                           { run(); });
 
+    // 4. Wait for worker thread to be ready
     cv_.wait(lock, [&]
              { return ready_; });
   }
