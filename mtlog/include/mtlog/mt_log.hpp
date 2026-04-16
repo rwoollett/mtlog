@@ -10,21 +10,19 @@
 #include <sstream>
 
 #include <fmt/format.h>
+
 #include <mtlog/format_pairs.hpp>
 #include <fmt/ranges.h>
 #include <fmt/chrono.h>
-
 
 namespace mt_logging
 {
 
   struct LogJob
   {
-    std::string file_name;
     std::string line;
-    std::ios_base::openmode mode = std::ios::app;
     bool include_thread_id = false;
-    std::string caller_thread_id; 
+    std::string caller_thread_id;
   };
 
   class LoggerThread
@@ -32,6 +30,8 @@ namespace mt_logging
   public:
     LoggerThread();
     ~LoggerThread();
+
+    void set_logfile(const std::string &filename);
 
     inline void log(LogJob job)
     {
@@ -54,8 +54,10 @@ namespace mt_logging
     std::condition_variable cv_;
     std::queue<LogJob> q_;
     bool stop_flag_ = false;
-    std::thread thread_;
     bool ready_ = false;
+
+    std::thread thread_;
+    std::ofstream outfile_;
 
     void run();
     void stop();
@@ -74,9 +76,8 @@ namespace mt_logging
       std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm_buf);
       return buffer;
     }
-
   };
 
-  LoggerThread& logger();
+  LoggerThread &logger();
 
 } // namespace mt_logging

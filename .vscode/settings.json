@@ -8,7 +8,7 @@
   "cmake.buildDirectory": "${workspaceFolder}/vscode_build",  
   "cmake.configureSettings": {
       "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-      "BUILD_TESTS": "ON"
+      "BUILD_MTLOG_TESTS": "ON"
   },
   "cmake.ctest.testExplorerIntegrationEnabled": true
 }

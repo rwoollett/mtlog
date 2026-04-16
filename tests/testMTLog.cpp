@@ -1,5 +1,5 @@
 
-#include <mtlog/mt_log.h>
+#include <mtlog/mt_log.hpp>
 #include <thread>
 
 #include "gtest/gtest.h"
@@ -35,7 +35,7 @@ TEST_F(MTLogTest, LogFileFromTwoThreads)
                   //
                   // Log using Log method
                   std::string msg = fmt::format("Token {} expired at {}", i, "dd");
-                  mt_logging::logger.log({ "token.log", msg, std::ios::app, true });
+                  mt_logging::logger().log({ msg, true });
 
                 } catch (std::exception &e) {
                     std::cerr << "std exception: " << e.what() << "\n";

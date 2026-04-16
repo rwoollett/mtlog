@@ -2,28 +2,26 @@
 
 namespace mt_logging
 {
+
   LoggerThread &logger()
   {
     static LoggerThread instance;
     return instance;
   }
 
-  // LoggerThread::LoggerThread()
-  //     : thread_([this]
-  //               { run(); }) {}
-  // LoggerThread::LoggerThread()
-  // {
-  //   std::unique_lock<std::mutex> lock(mtx_);
-  //   thread_ = std::thread([this]
-  //                         { run(); });
-  // }
   LoggerThread::LoggerThread()
   {
     std::unique_lock<std::mutex> lock(mtx_);
+
+    // Default log file
+    const char *env = std::getenv("MTLOG_LOGFILE");
+    std::string logfile = env ? env : "mt_logger.log";
+
+    outfile_.open(logfile, std::ios::app);
+
     thread_ = std::thread([this]
                           { run(); });
 
-    // Wait until worker thread is actually waiting on cv_
     cv_.wait(lock, [&]
              { return ready_; });
   }
@@ -32,6 +30,14 @@ namespace mt_logging
   {
     stop();
     thread_.join();
+    outfile_.close();
+  }
+
+  void LoggerThread::set_logfile(const std::string &filename)
+  {
+    std::lock_guard<std::mutex> lock(mtx_);
+    outfile_.close();
+    outfile_.open(filename, std::ios::app);
   }
 
   void LoggerThread::stop()
@@ -43,29 +49,11 @@ namespace mt_logging
     cv_.notify_all();
   }
 
-  // void LoggerThread::run()
-  // {
-  //   LogJob job;
-  //   while (true)
-  //   {
-  //     {
-  //       std::unique_lock<std::mutex> lock(mtx_);
-  //       cv_.wait(lock, [&]
-  //                { return stop_flag_ || !q_.empty(); });
-  //       if (stop_flag_ && q_.empty())
-  //         return;
-  //       job = std::move(q_.front());
-  //       q_.pop();
-  //     }
-  //     write(job);
-  //   }
-  // }
-
   void LoggerThread::run()
   {
     std::unique_lock<std::mutex> lock(mtx_);
     ready_ = true;
-    cv_.notify_one(); // wake constructor
+    cv_.notify_one();
 
     while (true)
     {
@@ -85,23 +73,24 @@ namespace mt_logging
 
   void LoggerThread::write(const LogJob &job)
   {
-    std::ofstream outfile(job.file_name, job.mode);
-    if (!outfile.good())
+    if (!outfile_.good())
       return;
 
     std::string ts = timestamp();
 
     if (job.include_thread_id)
     {
-      outfile << fmt::format("{} [thread {}]  {}\n",
-                             ts,
-                             job.caller_thread_id,
-                             job.line);
+      outfile_ << fmt::format("{} [thread {}]  {}\n",
+                              ts,
+                              job.caller_thread_id,
+                              job.line);
     }
     else
     {
-      outfile << fmt::format("{}  {}\n", ts, job.line);
+      outfile_ << fmt::format("{}  {}\n", ts, job.line);
     }
+
+    outfile_.flush();
   }
 
 } // namespace mt_logging
