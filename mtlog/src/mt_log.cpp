@@ -1,4 +1,5 @@
 ﻿#include <mtlog/mt_log.hpp>
+#include <iostream>
 
 namespace mt_logging
 {
@@ -17,7 +18,8 @@ namespace mt_logging
     std::string logfile = env ? env : "mt_logger.log";
 
     // 1. Truncate the file once at startup
-    if (std::getenv("MTLOG_CLEAR_ON_START"))
+    const char *clear = std::getenv("MTLOG_CLEAR_ON_START");
+    if (clear != nullptr)
     {
       std::ofstream clear_file(logfile, std::ios::out | std::ios::trunc);
       // clear_file closes automatically here

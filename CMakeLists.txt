@@ -3,6 +3,10 @@ project(MTLogger VERSION 1.0
         DESCRIPTION "Dedicated logging thread + queue"
         LANGUAGES C CXX)
 
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
@@ -19,6 +23,7 @@ add_subdirectory(mtlog)
 
 # Add an option to control whether to build tests
 option(BUILD_MTLOG_TESTS "Build tests and include Google Test" OFF)
+
 if (BUILD_MTLOG_TESTS)
   FetchContent_Declare(
     googletest

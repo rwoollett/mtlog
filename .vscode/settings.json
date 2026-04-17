@@ -1,14 +1,27 @@
+// {
+//   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+//   "C_Cpp.default.compilerPath": "/usr/bin/g++-13",
+//   "C_Cpp.default.compileCommands": "${workspaceFolder}/vscode_build/compile_commands.json",
+//   "C_Cpp.default.includePath": [ 
+//     "${workspaceFolder}/**" 
+//   ],
+//   "cmake.buildDirectory": "${workspaceFolder}/vscode_build",  
+//   "cmake.configureSettings": {
+//       "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+//       "BUILD_MTLOG_TESTS": "ON"
+//   },
+//   "cmake.ctest.testExplorerIntegrationEnabled": true
+// }
 {
-  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "cmake.useCMakePresets": "always",
+
+  "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+
   "C_Cpp.default.compilerPath": "/usr/bin/g++-13",
-  "C_Cpp.default.compileCommands": "${workspaceFolder}/vscode_build/compile_commands.json",
-  "C_Cpp.default.includePath": [ 
-    "${workspaceFolder}/**" 
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/compile_commands.json",
+
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/**"
   ],
-  "cmake.buildDirectory": "${workspaceFolder}/vscode_build",  
-  "cmake.configureSettings": {
-      "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-      "BUILD_MTLOG_TESTS": "ON"
-  },
   "cmake.ctest.testExplorerIntegrationEnabled": true
 }

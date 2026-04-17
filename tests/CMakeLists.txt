@@ -7,5 +7,11 @@ add_executable(TestMTLog
 
 target_link_libraries(TestMTLog gtest_main gmock_main MTLog)
 include(GoogleTest)
-gtest_discover_tests(TestMTLog)
+
+#gtest_discover_tests(TestMTLog)
+
+gtest_discover_tests(TestMTLog
+    PROPERTIES
+        ENVIRONMENT "MTLOG_CLEAR_ON_START=1"
+)
 
