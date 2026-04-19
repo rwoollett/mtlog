@@ -25,6 +25,20 @@ namespace mt_logging
       // clear_file closes automatically here
     }
 
+    const char *lvl = std::getenv("MTLOG_LEVEL");
+    if (lvl)
+    {
+      std::string s = lvl;
+      if (s == "debug")
+        min_level_ = LogLevel::Debug;
+      else if (s == "info")
+        min_level_ = LogLevel::Info;
+      else if (s == "warn")
+        min_level_ = LogLevel::Warn;
+      else if (s == "error")
+        min_level_ = LogLevel::Error;
+    }
+
     // 2. Reopen in append mode for the lifetime of the logger
     outfile_.open(logfile, std::ios::app);
 
@@ -40,7 +54,8 @@ namespace mt_logging
   LoggerThread::~LoggerThread()
   {
     stop();
-    thread_.join();
+    if (thread_.joinable())
+      thread_.join();
     outfile_.close();
   }
 
@@ -51,8 +66,15 @@ namespace mt_logging
     outfile_.open(filename, std::ios::app);
   }
 
+  void LoggerThread::set_min_level(LogLevel lvl)
+  {
+    min_level_ = lvl;
+  }
+
   void LoggerThread::stop()
   {
+    accepting_logs.store(false, std::memory_order_relaxed);
+
     {
       std::lock_guard<std::mutex> lock(mtx_);
       stop_flag_ = true;
@@ -60,25 +82,62 @@ namespace mt_logging
     cv_.notify_all();
   }
 
+  // void LoggerThread::run()
+  // {
+  //   std::unique_lock<std::mutex> lock(mtx_);
+  //   ready_ = true;
+  //   cv_.notify_one();
+
+  //   while (true)
+  //   {
+  //     cv_.wait(lock, [&]
+  //              { return stop_flag_ || !q_.empty(); });
+  //     if (stop_flag_ && q_.empty())
+  //       return;
+
+  //     LogJob job = std::move(q_.front());
+  //     q_.pop();
+
+  //     lock.unlock();
+  //     write(job);
+  //     lock.lock();
+  //   }
+  // }
+
   void LoggerThread::run()
   {
-    std::unique_lock<std::mutex> lock(mtx_);
-    ready_ = true;
+    {
+      std::unique_lock<std::mutex> lock(mtx_);
+      ready_ = true;
+    }
     cv_.notify_one();
+
+    std::vector<LogJob> batch;
+    batch.reserve(256);
 
     while (true)
     {
-      cv_.wait(lock, [&]
-               { return stop_flag_ || !q_.empty(); });
-      if (stop_flag_ && q_.empty())
-        return;
+      {
+        std::unique_lock<std::mutex> lock(mtx_);
 
-      LogJob job = std::move(q_.front());
-      q_.pop();
+        cv_.wait_for(lock, std::chrono::milliseconds(50),
+                     [&]
+                     { return stop_flag_ || !q_.empty(); });
 
-      lock.unlock();
-      write(job);
-      lock.lock();
+        if (stop_flag_ && q_.empty())
+          break;
+
+        while (!q_.empty() && batch.size() < 256)
+        {
+          batch.push_back(std::move(q_.front()));
+          q_.pop();
+        }
+      }
+
+      for (auto &job : batch)
+        write(job);
+
+      batch.clear();
     }
   }
 

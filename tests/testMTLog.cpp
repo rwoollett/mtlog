@@ -10,6 +10,7 @@ public:
   void SetUp() override
   {
     std::cerr << "Setup\n";
+    
   }
 
   void TearDown() override
@@ -21,6 +22,7 @@ public:
 
 TEST_F(MTLogTest, LogFileFromTwoThreads)
 {
+  mt_logging::logger().set_min_level(mt_logging::LogLevel::Info);
   bool hasRun = false;
   int no_ts = 2;
   std::thread t_list[] = {
@@ -35,11 +37,17 @@ TEST_F(MTLogTest, LogFileFromTwoThreads)
                   //
                   // Log using Log method
                   std::string msg = fmt::format("Token {} expired at {}", i, "dd");
-                  mt_logging::logger().log({ msg, true });
+                  //mt_logging::logger().log({ msg, true });
+                  mt_logging::logger().log({
+                      .line = msg,
+                      .level = mt_logging::LogLevel::Info,
+                      .include_thread_id = true
+                  });
 
                 } catch (std::exception &e) {
                     std::cerr << "std exception: " << e.what() << "\n";
                 }
+                //
             } });
   }
   int mc = 0, mm = 0;
@@ -60,7 +68,6 @@ TEST_F(MTLogTest, LogFileFromTwoThreads)
   {
     t_list[k].join();
   }
-
   std::cerr << "\nTime outs " << mm << std::endl;
   ASSERT_EQ(2000, mc);
 }

@@ -17,10 +17,18 @@
 
 namespace mt_logging
 {
+  enum class LogLevel
+  {
+    Debug = 0,
+    Info,
+    Warn,
+    Error
+  };
 
   struct LogJob
   {
     std::string line;
+    LogLevel level = LogLevel::Info;
     bool include_thread_id = false;
     std::string caller_thread_id;
   };
@@ -32,9 +40,16 @@ namespace mt_logging
     ~LoggerThread();
 
     void set_logfile(const std::string &filename);
+    void set_min_level(LogLevel lvl);
 
     inline void log(LogJob job)
     {
+      if (!accepting_logs.load(std::memory_order_relaxed))
+        return;
+        
+      if (job.level < min_level_)
+        return; // filtered out
+
       if (job.include_thread_id)
       {
         std::ostringstream oss;
@@ -50,6 +65,9 @@ namespace mt_logging
     }
 
   private:
+    LogLevel min_level_ = LogLevel::Debug;
+    std::atomic<bool> accepting_logs{true};
+
     std::mutex mtx_;
     std::condition_variable cv_;
     std::queue<LogJob> q_;
