@@ -22,6 +22,25 @@ This is the pattern used in high‑performance servers.
 
 # Library dependency(s) 
 
+1) Install fmt system‑wide
+On ubuntu/debain: sudo apt install nlohmann-json3-dev
+
+git clone https://github.com/fmtlib/fmt.git
+cd fmt
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+sudo cmake --build build --target install
+
+creates:
+/usr/local/include/fmt/*.h
+/usr/local/lib/libfmt.a
+/usr/local/lib/cmake/fmt/fmtConfig.cmake
+
+Cmake:
+find_package(fmt REQUIRED)
+target_link_libraries(MTLog PUBLIC fmt::fmt)
+
+
+
 # 🚀 Available Scripts
 
 In the project directory, you can build the Application with CMakeLists
