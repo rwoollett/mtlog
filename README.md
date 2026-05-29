@@ -39,7 +39,11 @@ Cmake:
 find_package(fmt REQUIRED)
 target_link_libraries(MTLog PUBLIC fmt::fmt)
 
+# Install Release 
 
+Use build-release folder.
+cmake -B build-release -DCMAKE_BUILD_TYPE=Release
+sudo cmake --build build-release --target install
 
 # 🚀 Available Scripts
 
