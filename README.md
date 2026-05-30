@@ -23,7 +23,6 @@ This is the pattern used in high‑performance servers.
 # Library dependency(s) 
 
 1) Install fmt system‑wide
-On ubuntu/debain: sudo apt install nlohmann-json3-dev
 
 git clone https://github.com/fmtlib/fmt.git
 cd fmt
