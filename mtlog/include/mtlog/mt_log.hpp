@@ -46,7 +46,7 @@ namespace mt_logging
     {
       if (!accepting_logs.load(std::memory_order_relaxed))
         return;
-        
+
       if (job.level < min_level_)
         return; // filtered out
 
@@ -84,11 +84,18 @@ namespace mt_logging
     inline std::string timestamp()
     {
       using namespace std::chrono;
-      auto now = system_clock::now();
-      auto t = system_clock::to_time_t(now);
 
-      std::tm tm_buf;
+      // Modern C++ time
+      auto now = system_clock::now();
+      std::time_t t = system_clock::to_time_t(now);
+
+      std::tm tm_buf{};
+
+#if defined(_WIN32)
+      localtime_s(&tm_buf, &t);
+#else
       localtime_r(&t, &tm_buf);
+#endif
 
       char buffer[32];
       std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm_buf);
