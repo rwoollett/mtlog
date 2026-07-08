@@ -33,7 +33,7 @@
     {
       "name": "windows-debug",
       "displayName": "Debug (Windows MSYS2)",
-      "generator": "MinGW Makefiles",
+      "generator": "Ninja",
       "binaryDir": "build/windows-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
@@ -47,7 +47,7 @@
     {
       "name": "windows-release",
       "displayName": "Release (Windows MSYS2)",
-      "generator": "MinGW Makefiles",
+      "generator": "Ninja",
       "binaryDir": "build/windows-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
