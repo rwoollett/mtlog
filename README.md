@@ -40,13 +40,13 @@ target_link_libraries(MTLog PUBLIC fmt::fmt)
 
 # Install Release 
 
-Use build-release folder.
+Ubuntu/Linux: Use build/release folder.
 cmake -B build/release -DCMAKE_BUILD_TYPE=Release
 sudo cmake --build build/release --target install
 
-cmake -B build/windows-release -DCMAKE_BUILD_TYPE=Release
+Windows:
+cmake --preset windows-release
 cmake --build build/windows-release --target install
-
 
 # 🚀 Available Scripts
 
