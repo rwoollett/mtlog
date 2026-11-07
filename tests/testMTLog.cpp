@@ -10,7 +10,6 @@ public:
   void SetUp() override
   {
     std::cerr << "Setup\n";
-    
   }
 
   void TearDown() override
@@ -24,8 +23,9 @@ TEST_F(MTLogTest, LogFileFromTwoThreads)
 {
   mt_logging::logger().set_min_level(mt_logging::LogLevel::Info);
   bool hasRun = false;
-  int no_ts = 2;
+  int no_ts = 3;
   std::thread t_list[] = {
+      std::thread(),
       std::thread(),
       std::thread(),
   };
@@ -36,8 +36,9 @@ TEST_F(MTLogTest, LogFileFromTwoThreads)
                 try {
                   //
                   // Log using Log method
-                  std::string msg = fmt::format("Token {} expired at {}", i, "dd");
-                  //mt_logging::logger().log({ msg, true });
+                  std::ostringstream oss;
+                  oss << std::this_thread::get_id();
+                  std::string msg = fmt::format("Token {} expired from thread {}", i, oss.str());
                   mt_logging::logger().log({
                       .line = msg,
                       .level = mt_logging::LogLevel::Info,

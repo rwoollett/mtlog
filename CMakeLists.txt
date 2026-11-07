@@ -5,6 +5,10 @@ project(MTLogger VERSION 1.0
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_FLAGS_TSAN "-O1 -g -fsanitize=thread -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_TSAN "-O1 -g -fsanitize=thread -fno-omit-frame-pointer")
+set(CMAKE_EXE_LINKER_FLAGS_TSAN "-fsanitize=thread")
+set(CMAKE_SHARED_LINKER_FLAGS_TSAN "-fsanitize=thread")
 
 find_package(fmt REQUIRED)
 
@@ -35,6 +39,11 @@ install(FILES
 
 # Optional tests
 option(BUILD_MTLOG_TESTS "Build tests and include Google Test" OFF)
+option(BUILD_MTLOG_TSAN "Build tests for TSAN Test" OFF)
+
+if (BUILD_MTLOG_TSAN)
+    add_subdirectory(tsantest)
+endif()
 
 if (BUILD_MTLOG_TESTS)
     include(FetchContent)
@@ -46,6 +55,6 @@ if (BUILD_MTLOG_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     include(CTest)
-    enable_testing()
+    #enable_testing()
     add_subdirectory(tests)
 endif()

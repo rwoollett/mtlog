@@ -8,6 +8,7 @@
 #include <chrono>
 #include <ctime>
 #include <sstream>
+#include <iostream>
 
 #include <fmt/format.h>
 
@@ -47,7 +48,7 @@ namespace mt_logging
       if (!accepting_logs.load(std::memory_order_relaxed))
         return;
 
-      if (job.level < min_level_)
+      if (job.level < min_level_.load())
         return; // filtered out
 
       if (job.include_thread_id)
@@ -59,20 +60,20 @@ namespace mt_logging
 
       {
         std::lock_guard<std::mutex> lock(mtx_);
-        q_.push(std::move(job));
+        q_.push_back(std::move(job));
       }
+
       cv_.notify_one();
     }
 
   private:
-    LogLevel min_level_ = LogLevel::Debug;
+    std::atomic<LogLevel> min_level_{LogLevel::Debug};
     std::atomic<bool> accepting_logs{true};
 
     std::mutex mtx_;
     std::condition_variable cv_;
-    std::queue<LogJob> q_;
-    bool stop_flag_ = false;
-    bool ready_ = false;
+    std::deque<LogJob> q_;
+    std::atomic<bool> stop_flag_{false};
 
     std::thread thread_;
     std::ofstream outfile_;

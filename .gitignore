@@ -40,5 +40,6 @@ set_tp430.sh
 set_env_rwlltt.sh
 tls
 compile_commands.json
+mt_logger.log
 
 
