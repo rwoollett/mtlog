@@ -82,6 +82,11 @@ namespace mt_logging
                  [&]
                  { return stop_flag_.load() || !q_.empty(); });
 
+      // NB: caused a data race using wiat_for at 50ms - it is not needed to poll the q not empty
+      //  cv_.wait_for(lock, std::chrono::milliseconds(50),
+      //                [&]
+      //                { return stop_flag_.load() || !q_.empty(); });                 
+
         if (stop_flag_.load() && q_.empty())
           break;
 

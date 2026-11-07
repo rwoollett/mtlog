@@ -40,13 +40,25 @@ target_link_libraries(MTLog PUBLIC fmt::fmt)
 
 # Install Release 
 
-Ubuntu/Linux: Use build/release folder.
+### Ubuntu/Linux: Use build/release folder.
+```sh
 cmake -B build/release -DCMAKE_BUILD_TYPE=Release
 sudo cmake --build build/release --target install
+```
 
-Windows:
+#### TSAN local install
+
+TSAN Ubuntu/Linux: Use build/tsan folder.
+```sh
+cmake -B build/tsan -DCMAKE_BUILD_TYPE=TSAN
+sudo cmake --build build/tsan --target install
+```
+
+### Windows:
+```powershell
 cmake --preset windows-release
 cmake --build build/windows-release --target install
+```
 
 # 🚀 Available Scripts
 
