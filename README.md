@@ -50,7 +50,7 @@ sudo cmake --build build/release --target install
 
 TSAN Ubuntu/Linux: Use build/tsan folder.
 ```sh
-cmake -B build/tsan -DCMAKE_BUILD_TYPE=TSAN
+cmake -B build/tsan -DCMAKE_BUILD_TYPE=TSAN -DBUILD_MTLOG_TESTS=OFF -DBUILD_MTLOG_TSAN=OFF
 sudo cmake --build build/tsan --target install
 ```
 
